@@ -1,0 +1,38 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata below."
+type: software
+title: "apass2johnson"
+abstract: >
+  Empirical photometric transformation from APASS DR9 Sloan gri magnitudes
+  to the Johnson-Kron-Cousins BVRcIc photometric system.
+  Implements the formulae of N. Montigiani (2026) with automatic APASS/SFD
+  retrieval and full error propagation. Valid for -0.28 <= (g-r) <= +1.10.
+authors:
+  - family-names: Montigiani
+    given-names: "N."
+    affiliation: "Independent researcher"
+version: "5.0"
+date-released: 2026-01-01
+license: MIT
+url: "https://github.com/montigiani/apass2johnson"
+doi: "10.5281/zenodo.XXXXXXX"
+repository-code: "https://github.com/montigiani/apass2johnson"
+keywords:
+  - photometry
+  - astronomy
+  - APASS
+  - Johnson-Cousins
+  - photometric transformation
+  - stellar photometry
+  - CCD photometry
+references:
+  - type: article
+    title: >
+      Empirical Transformation Formulae from APASS DR9
+      to the Johnson-Kron-Cousins BVRcIc Photometric System
+    authors:
+      - family-names: Montigiani
+        given-names: "N."
+    journal: "PASP"
+    year: 2026
+    notes: "submitted"

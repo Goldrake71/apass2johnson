@@ -1,0 +1,13 @@
+# Example input file for apass2johnson.py
+# Required columns: RA (hh mm ss.sss), DEC (+/-dd mm ss.ss)
+# Optional: Name, g, eg, r, er, i, ei, EBV
+#
+# If g/r/i columns are absent or empty, the software retrieves them
+# automatically from APASS DR9 via VizieR.
+#
+Name,RA,DEC
+SS_Cyg,21 42 42.800,+43 35 09.90
+RR_Lyr,19 25 27.913,+42 47 03.69
+T_Cep,21 09 31.778,+68 29 27.16
+chi_Cyg,19 50 33.925,+32 54 50.61
+Mira,02 19 20.793,-02 58 39.50
