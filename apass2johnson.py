@@ -10,7 +10,7 @@
     N. Montigiani (2026), "Empirical Transformation Formulae from APASS DR9
     to the Johnson-Kron-Cousins BVRcIc Photometric System", PASP/AJ, submitted.
     GitHub: https://github.com/montigiani/apass2johnson
-    DOI:    https://doi.org/10.5281/zenodo.XXXXXXX
+    DOI:    https://doi.org/10.5281/zenodo.19153253
 
   TRANSFORMATION FORMULAE — Version B (observed APASS DR9 magnitudes as input)
   ─────────────────────────────────────────────────────────────────────────────
@@ -1049,7 +1049,7 @@ def print_banner():
     print(f"""
 {CYAN}{BOLD}╔══════════════════════════════════════════════════════════════╗
 ║      apass2johnson  v5.0  —  CCD Photometric Transformation  ║
-║   SDSS (g,r,i) → Johnson-Cousins (V, B, Rc, Ic) + errors     ║
+║   SDSS (g,r,i) → Johnson-Cousins (V, B, Rc, Ic) + errors    ║
 ╚══════════════════════════════════════════════════════════════╝{RST}
   Formulae — N. Montigiani (2026):
     V  → v5.0  N=281  RMS=0.032  (+9% vs Lupton 2005)
