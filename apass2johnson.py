@@ -10,7 +10,7 @@
     N. Montigiani (2026), "Empirical Transformation Formulae from APASS DR9
     to the Johnson-Kron-Cousins BVRcIc Photometric System", PASP/AJ, submitted.
     GitHub: https://github.com/montigiani/apass2johnson
-    DOI:    https://doi.org/10.5281/zenodo.19153253
+    DOI:    https://doi.org/10.5281/zenodo.19153359
 
   TRANSFORMATION FORMULAE — Version B (observed APASS DR9 magnitudes as input)
   ─────────────────────────────────────────────────────────────────────────────
