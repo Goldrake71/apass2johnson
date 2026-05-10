@@ -8,32 +8,41 @@
 
   REFERENCE
     N. Montigiani (2026), "Empirical Transformation Formulae from APASS DR9
-    to the Johnson-Kron-Cousins BVRcIc Photometric System", PASP/AJ, submitted.
-    GitHub: https://github.com/montigiani/apass2johnson
+    to the Johnson-Kron-Cousins BVRcIc Photometric System", JAAVSO, 2026.
+    GitHub: https://github.com/Goldrake71/apass2johnson
     DOI:    https://doi.org/10.5281/zenodo.19153359
 
   TRANSFORMATION FORMULAE — Version B (observed APASS DR9 magnitudes as input)
   ─────────────────────────────────────────────────────────────────────────────
-    V  = g − 0.01137 − 0.55868·(g−r) + 0.00563·(g−r)²  [v5.0, RMS=0.032 mag]
-    B  = g + 0.16841 + 0.44387·(g−r) + 0.02810·(g−r)²  [v5.0, RMS=0.058 mag]
-    Rc = r − 0.1462  − 0.0763·(g−r)  − 0.0426·(g−r)²   [v4.0, RMS=0.051 mag]
+    V  = g − 0.01137 − 0.55868·(g−r) + 0.00563·(g−r)²  [RMS=0.030 mag]
+    B  = g + 0.16841 + 0.44387·(g−r) + 0.02810·(g−r)²  [RMS=0.053 mag]
+    Rc = r − 0.1462  − 0.0763·(g−r)  − 0.0426·(g−r)²   [RMS=0.043 mag]
     Ic = i − 0.3235  + 0.4591·(r−i)  − 0.2421·(r−i)²
-             − 0.3115·(g−r)                              [v4.0, RMS=0.083 mag, PROVISIONAL]
+             − 0.3115·(g−r)                              [RMS=0.073 mag, PROVISIONAL]
 
     Valid for: −0.28 ≤ (g−r) ≤ +1.10  (spectral types OB to late K)
+    Calibration: ODR fit on N=41,311 APASS DR9 stars cross-matched to Landolt
+                 standard fields, with iterative 3.5·MAD outlier rejection.
+    Coefficients: 95% bootstrap confidence intervals (N=1000 resamplings).
 
   Version A (reddening-corrected input): same coefficients, apply to
     g₀ = g − Rg·E(B−V),  r₀ = r − Rr·E(B−V),  i₀ = i − Ri·E(B−V)
-    Recommended for E(B−V) > 0.20 mag.
+    Recommended for E(B−V) > 0.20 mag (Sec. 3.3 of the paper).
 
   TOTAL UNCERTAINTY (quadrature):
     σ_tot² = σ_APASS²(propagated) + σ_calibration² + σ_E(B-V)²
 
-  VALIDATION (N=281 independent standard stars, 4 catalogues):
-    V:  RMS=0.032±0.002  +9%  vs Lupton (2005)   slope p=0.765 n.s.
-    B:  RMS=0.058±0.004  +40% vs Lupton (2005)   slope p=0.804 n.s. vs E(B-V)
-    Rc: RMS=0.051±0.004  +16% vs Lupton (2005)   slope p=0.732 n.s.
-    Ic: RMS=0.083±0.007  +4%  vs Lupton (2005)   PROVISIONAL
+  VALIDATION (N=287 independent standard stars from 4 catalogues:
+              Landolt 1992/2013, Clem & Landolt 2013, Stetson/Pancino 2022)
+    V:  RMS=0.030±0.002 mag  (95% CI 0.026–0.033)   +7%  vs Lupton (2005)
+    B:  RMS=0.053±0.004 mag  (95% CI 0.045–0.061)   +36% vs Lupton (2005)
+    Rc: RMS=0.043±0.004 mag  (95% CI 0.037–0.048)   +26% vs Lupton (2005)
+    Ic: RMS=0.073±0.007 mag  (95% CI 0.059–0.086)   +30% vs Lupton (2005)  [PROVISIONAL]
+
+    No significant chromatic residual trend vs (g−r)₀ for V (p=0.483),
+    Rc (p=0.273), Ic (p=0.767). For B a residual chromatic slope persists
+    (p<0.001) but is +0.025 mag/mag — five times smaller than Lupton's
+    (+0.138 mag/mag), with no practical impact.
 
   HOW TO USE
   ──────────
@@ -122,32 +131,44 @@ except ImportError:
 #  COSTANTI
 # ══════════════════════════════════════════════════════════════════════════════
 
-# Extinction coefficients Cardelli et al. (1989), R_V=3.1
+# Extinction coefficients (Cardelli et al. 1989, R_V=3.1; with O'Donnell 1994
+# update for the optical). SDSS g, r, i values from convolution with the
+# Cardelli law via the NASA/IPAC IRSA Dust Extinction Calculator
+# (Schlafly & Finkbeiner 2011). See Sec. 3.3 of the paper.
 R_EXT = {"g": 3.640, "r": 2.700, "i": 2.060, "V": 3.100, "B": 4.061,
-         "Rc": 2.320, "Ic": 1.490}  # Cousins R e I (Cardelli+1989)
+         "Rc": 2.320, "Ic": 1.490}
 
-# Transformation coefficients (N. Montigiani 2026, v5.0)
-# Calibrazione ODR su N=281-281 stars (Landolt 1992/2013 + Clem 2013 + Stetson 2022)
+# Transformation coefficients (N. Montigiani 2026, JAAVSO)
+# Calibrazione ODR su N=41,311 APASS DR9 stars (Landolt fields, |b|>15°,
+# σ_g, σ_r ≤ 0.08 mag, iterative 3.5·MAD outlier rejection).
+# AIC-based model selection: degree-2 polynomial in (g-r) for V, B, Rc;
+# 4-parameter model with (r-i), (r-i)^2 and (g-r) covariate for Ic.
+# Coefficients with 95% bootstrap CI (N=1000) — see Table 1 of the paper.
 # ─────────────────────────────────────────────────────────────────────────────
-# V = g + A0V + A1V*(g-r) + A2V*(g-r)^2   [v5.0 — aggiornata con Stetson 2022]
-# RMS=0.032 mag su N=281, +9% vs Lupton (2005), slope p=0.89 n.s.
+# V = g + A0V + A1V*(g-r) + A2V*(g-r)^2
+# Validation RMS = 0.030 mag on N=287 stars, +7% vs Lupton (2005).
+# Chromatic slope p[(g-r)₀] = 0.483 (n.s.) — no significant residual trend.
 A0V, A1V, A2V   = -0.01137, -0.55868, +0.00563
-# B = g + A0B + A1B*(g-r) + A2B*(g-r)^2   [v5.0 — aggiornata con Stetson 2022]
-# RMS=0.058 mag su N=281, +40% vs Lupton (2005), slope p=0.69 n.s. su L92
+# B = g + A0B + A1B*(g-r) + A2B*(g-r)^2
+# Validation RMS = 0.053 mag on N=287 stars, +36% vs Lupton (2005) — largest
+# improvement of this work. Residual chromatic slope is +0.025 mag/mag,
+# five times smaller than Lupton's (+0.138 mag/mag).
 A0B, A1B, A2B   = +0.16841, +0.44387, +0.02810
-# Rc = r + A0RC + A1RC*(g-r) + A2RC*(g-r)^2  [v4.0 — confirmed, variation <1%]
-# RMS=0.051 mag su N=281, +16% vs Lupton (2005), slope p=0.73 n.s.
+# Rc = r + A0RC + A1RC*(g-r) + A2RC*(g-r)^2
+# Validation RMS = 0.043 mag on N=287 stars, +26% vs Lupton (2005).
+# Chromatic slope p[(g-r)₀] = 0.273 (n.s.).
 A0RC, A1RC, A2RC = -0.1462, -0.0763, -0.0426
-# Ic = i + A0IC + A1IC*(r-i) + A2IC*(r-i)^2 + A3IC_GR*(g-r)  [v4.0 — confirmed]
-# Modello M3 (AIC-ottimale). Re-fit con Stetson instabile → coefficienti invariati.
-# RMS=0.083 mag su N=281, +4% vs Lupton (2005), slope p=0.98 n.s.
+# Ic = i + A0IC + A1IC*(r-i) + A2IC*(r-i)^2 + A3IC_GR*(g-r)
+# Validation RMS = 0.073 mag on N=287 stars, +30% vs Lupton (2005).
+# PROVISIONAL: scatter still large; only N=20 M-type stars in validation.
+# Chromatic slope p[(g-r)₀] = 0.767 (n.s.).
 A0IC, A1IC, A2IC, A3IC_GR = -0.3235, +0.4591, -0.2421, -0.3115
 
-# RMS di calibrazione su campione di validazione indipendente (N=281-281 stars)
-RMS_V  = 0.0275  # v5.0: Landolt 1992/2013 + Clem 2013 + Stetson 2022, N=281
-RMS_B  = 0.0582  # v5.0: Landolt 1992/2013 + Clem 2013 + Stetson 2022, N=281
-RMS_RC = 0.0501  # v4.0 confirmed: validated on N=281 stars
-RMS_IC = 0.0793  # v4.0 confirmed: validated on N=281 stars
+# Validation RMS on N=287 independent standards (Sec. 5 of the paper)
+RMS_V  = 0.030   # 95% CI: 0.026–0.033
+RMS_B  = 0.053   # 95% CI: 0.045–0.061
+RMS_RC = 0.043   # 95% CI: 0.037–0.048
+RMS_IC = 0.073   # 95% CI: 0.059–0.086  (provisional)
 
 # Valid colour range
 GR_MIN, GR_MAX = -0.28, +1.10
@@ -556,34 +577,50 @@ def compute_johnson(g: float, r: float, i: Optional[float],
                     eg: float, er: float, ei: Optional[float],
                     ebv: float, ebv_method: str) -> dict:
     """
-    Calcola V, B, Rc, Ic con le formule N. Montigiani (2026) v5.0 per uso
-    diretto nelle immagini CCD (magnitudini SDSS osservate, senza correzione
-    per estinzione — Version B).
+    Calcola V, B, Rc, Ic con le formule N. Montigiani (2026) per uso diretto
+    nelle immagini CCD (magnitudini SDSS osservate, senza correzione per
+    estinzione — Version B).
 
     FORMULE (Version B - magnitudini osservate APASS DR9):
-        V  = g + A0V  + A1V*(g-r)  + A2V*(g-r)^2    [v5.0 — aggiornata]
-        B  = g + A0B  + A1B*(g-r)  + A2B*(g-r)^2    [v5.0 — aggiornata]
-        Rc = r + A0RC + A1RC*(g-r) + A2RC*(g-r)^2   [v4.0 — confirmed]
-        Ic = i + A0IC + A1IC*(r-i) + A2IC*(r-i)^2 + A3IC_GR*(g-r)  [v4.0 — confirmed]
+        V  = g + A0V  + A1V*(g-r)  + A2V*(g-r)^2
+        B  = g + A0B  + A1B*(g-r)  + A2B*(g-r)^2
+        Rc = r + A0RC + A1RC*(g-r) + A2RC*(g-r)^2
+        Ic = i + A0IC + A1IC*(r-i) + A2IC*(r-i)^2 + A3IC_GR*(g-r)
+
+    Calibrate via Orthogonal Distance Regression on N=41,311 APASS DR9 stars,
+    AIC-selected polynomial orders, validated on N=287 independent standards
+    drawn from four catalogues (Landolt 1992/2013, Clem & Landolt 2013,
+    Stetson/Pancino 2022).
 
     PARTIAL DERIVATIVES for error propagation:
         V:   dV/dg = 1+A1V = +0.441      dV/dr = -A1V = +0.559
         B:   dB/dg = 1+A1B = +1.444      dB/dr = -A1B = +0.444
-        Rc:  dRc/d(g-r) = A1RC + 2*A2RC*(g-r)  (dipende dal colore)
+        Rc:  dRc/d(g-r) = A1RC + 2*A2RC*(g-r)  (depends on colour)
              dRc/dr = 1 - dRc/d(g-r)
              dRc/dg = +dRc/d(g-r)
-        Ic:  dIc/di = 1 - A1IC - 2*A2IC*(r-i)   (dipende dal colore)
+        Ic:  dIc/di = 1 - A1IC - 2*A2IC*(r-i)   (depends on colour)
              dIc/dr = A1IC + 2*A2IC*(r-i) - A3IC_GR
-             dIc/dg = +A3IC_GR = -0.312 (fisso)
+             dIc/dg = +A3IC_GR = -0.312 (fixed)
 
-    Novità v5.0 rispetto a v4.0:
-        V: aggiornata con campione esteso a N=281 stars (Landolt 1992/2013 +
-           Clem & Landolt 2013 + Stetson in Pancino 2022). RMS=0.032 mag,
-           miglioramento +9% vs Lupton (2005). Slope residui p=0.89 n.s.
-        B: aggiornata con stesso campione N=281 stars. RMS=0.058 mag,
-           miglioramento +40% vs Lupton (2005). Slope p=0.69 n.s. (L92).
-        Rc: confirmed unchanged (variation <1% with extended sample).
-        Ic: confirmed unchanged (ODR unstable with Stetson subsample).
+    EFFECTIVE EXTINCTION COEFFICIENTS (Sec. 3.3 of the paper):
+        R_V^eff  = R_g + A1V*ΔR_gr               = +3.115  (vs nominal R_V = 3.100)
+        R_B^eff  = R_g + A1B*ΔR_gr               = +4.057  (vs nominal R_B = 4.061)
+        R_Rc^eff = R_r + A1RC*ΔR_gr              = +2.628
+        R_Ic^eff = R_i + A1IC*ΔR_ri + A3IC*ΔR_gr = +2.061
+    where ΔR_gr ≡ R_g − R_r = 0.940 and ΔR_ri ≡ R_r − R_i = 0.640.
+
+    The residual extinction-related uncertainty term used here is
+    σ_E(B-V) = |R_band^eff − R_band| · E(B-V), which captures the discrepancy
+    between the effective extinction recovered by Version B and the nominal
+    JKC extinction coefficient. For V and B these are < 0.02 (negligible);
+    for Rc (~0.31) and Ic (~0.57) they are larger because those formulae mix
+    two SDSS bands with different extinction properties.
+
+    VALIDATION RMS on N=287 stars (Sec. 5 of the paper):
+        V:  RMS = 0.030 mag,  +7%  vs Lupton (2005),  no chromatic trend (p=0.483)
+        B:  RMS = 0.053 mag,  +36% vs Lupton (2005),  largest improvement
+        Rc: RMS = 0.043 mag,  +26% vs Lupton (2005),  no chromatic trend (p=0.273)
+        Ic: RMS = 0.073 mag,  +30% vs Lupton (2005),  PROVISIONAL
     """
     gr = g - r
 
@@ -617,7 +654,7 @@ def compute_johnson(g: float, r: float, i: Optional[float],
     sB_ebv   = delta_RB * ebv
     sB       = math.sqrt(sB_phot**2 + RMS_B**2 + sB_ebv**2)
 
-    # ── Rc band [v4.0 confirmed — degree-2, N=281 stars] ─
+    # ── Rc band ─────────────────────────────────────────────────────────────
     # Rc = r + A0RC + A1RC*(g-r) + A2RC*(g-r)^2
     # Derivate: dRc/d(g-r) = A1RC + 2*A2RC*(g-r)  varia con il colore
     Rc = r + A0RC + A1RC * gr + A2RC * gr**2
@@ -625,17 +662,16 @@ def compute_johnson(g: float, r: float, i: Optional[float],
     dRc_dr   = 1.0 - dRc_dgr            # dRc/dr [d(g-r)/dr = -1]
     dRc_dg   = dRc_dgr                  # dRc/dg [d(g-r)/dg = +1]
     sRc_phot = math.sqrt((abs(dRc_dg) * eg)**2 + (dRc_dr * er)**2)
-    # E(B-V) uncertainty for Rc: differential term
-    # d(Rc)/d(EBV) = R_Rc - R_r - A1RC*(R_g - R_r)
-    # where R_Rc=2.32 (Cousins R, Cardelli 1989)
-    # Note: do NOT use R_r*dRc_dr + R_g*dRc_dg (those are absolute extinctions)
+    # Residual extinction uncertainty (Sec. 3.3 of the paper):
+    # |R_Rc - R_Rc^eff| * E(B-V), where R_Rc^eff = R_r + A1RC * ΔR_gr.
     delta_RRc = abs(R_EXT["Rc"] - R_EXT["r"]
                    - A1RC * (R_EXT["g"] - R_EXT["r"]))
     sRc_ebv  = delta_RRc * ebv
     sRc      = math.sqrt(sRc_phot**2 + RMS_RC**2 + sRc_ebv**2)
 
-    # ── Ic band [v4.0 confirmed — 4-parameter model, N=281 stars, provisional] ──
+    # ── Ic band ─────────────────────────────────────────────────────────────
     # Ic = i + A0IC + A1IC*(r-i) + A2IC*(r-i)^2 + A3IC_GR*(g-r)
+    # PROVISIONAL band — see Sec. 5.4 of the paper.
     # Derivate (d(r-i)/di=-1, d(r-i)/dr=+1, d(g-r)/dg=+1, d(g-r)/dr=-1):
     #   dIc/di = 1 - A1IC - 2*A2IC*(r-i)
     #   dIc/dr = A1IC + 2*A2IC*(r-i) - A3IC_GR
@@ -650,9 +686,15 @@ def compute_johnson(g: float, r: float, i: Optional[float],
                          (dIc_di * ei)**2 +
                          (abs(dIc_dr) * er)**2 +
                          (abs(dIc_dg) * eg)**2)
-        # E(B-V) uncertainty for Ic: differential term (linear approximation)
+        # Residual extinction uncertainty (Sec. 3.3, eq. 13 of the paper):
+        # |R_Ic - R_Ic^eff| * E(B-V), where
+        # R_Ic^eff = R_i + A1IC*(R_r - R_i) + A3IC_GR*(R_g - R_r) = +2.061
+        # NOTE: the (g-r) covariate term A3IC_GR*ΔR_gr MUST be included here,
+        # otherwise the residual extinction uncertainty is overestimated by
+        # ~50% (e.g. 0.864 vs the correct 0.571 with R_V=3.1).
         delta_RIc  = abs(R_EXT["Ic"] - R_EXT["i"]
-                        - A1IC * (R_EXT["r"] - R_EXT["i"]))
+                        - A1IC    * (R_EXT["r"] - R_EXT["i"])
+                        - A3IC_GR * (R_EXT["g"] - R_EXT["r"]))
         sIc_ebv    = delta_RIc * ebv
         sIc        = math.sqrt(sIc_phot**2 + RMS_IC**2 + sIc_ebv**2)
     else:
@@ -890,9 +932,9 @@ def process_star(name: str,
         "warning":    " | ".join(filter(None, [res["warning"], ebv_warn])),
         "ebv_warn":   ebv_warn,
         # Sources
-        "source_VB":  "N. Montigiani (2026) v5.0 — N=281 stars",
-        "source_Rc":   "N. Montigiani (2026) v4.0 — N=281 stars (confirmed)",
-        "source_Ic":   "N. Montigiani (2026) v4.0 — N=281 stars (confirmed)",
+        "source_VB":  "N. Montigiani (2026) — N=287 validation stars",
+        "source_Rc":  "N. Montigiani (2026) — N=287 validation stars",
+        "source_Ic":  "N. Montigiani (2026) — N=287 validation stars (PROVISIONAL)",
     }
 
 
@@ -914,13 +956,13 @@ def _print_star_result(name, coord, g, eg, r, er, i, ei,
     print(f"    {'─'*W}")
 
     rows = [
-        ("V",    res["V"],  res["sV"],  "N. Montigiani (2026) v5.0  N=281"),
-        ("B",    res["B"],  res["sB"],  "N. Montigiani (2026) v5.0  N=281"),
-        ("Rc",   res["Rc"], res["sRc"], "N. Montigiani (2026) v4.0  N=281"),
+        ("V",    res["V"],  res["sV"],  "Montigiani (2026)  N=287"),
+        ("B",    res["B"],  res["sB"],  "Montigiani (2026)  N=287"),
+        ("Rc",   res["Rc"], res["sRc"], "Montigiani (2026)  N=287"),
         ("Ic",
          res["Ic"]  if res["Ic"]  is not None else None,
          res["sIc"] if res["sIc"] is not None else None,
-         "N. Montigiani (2026) v4.0  N=281"),
+         "Montigiani (2026)  N=287  [PROVISIONAL]"),
     ]
     for band, mag, sig, fonte in rows:
         if mag is None:
@@ -1049,13 +1091,15 @@ def print_banner():
     print(f"""
 {CYAN}{BOLD}╔══════════════════════════════════════════════════════════════╗
 ║      apass2johnson  v5.0  —  CCD Photometric Transformation  ║
-║   SDSS (g,r,i) → Johnson-Cousins (V, B, Rc, Ic) + errors    ║
+║   SDSS (g,r,i) → Johnson-Cousins (V, B, Rc, Ic) + errors     ║
 ╚══════════════════════════════════════════════════════════════╝{RST}
-  Formulae — N. Montigiani (2026):
-    V  → v5.0  N=281  RMS=0.032  (+9% vs Lupton 2005)
-    B  → v5.0  N=281  RMS=0.058  (+40% vs Lupton (2005))
-    Rc → v4.0  N=281  RMS=0.051  (+16% vs Lupton 2005)  [confirmed]
-    Ic → v4.0  N=281  RMS=0.083  (+4%  vs Lupton 2005)  [confirmed, provisional]
+  Formulae — N. Montigiani (2026), JAAVSO
+  Calibration: ODR fit on N=41,311 APASS DR9 stars
+  Validation:  N=287 independent standards from 4 catalogues
+    V   RMS=0.030 mag  (95% CI 0.026–0.033)   +7%  vs Lupton (2005)
+    B   RMS=0.053 mag  (95% CI 0.045–0.061)   +36% vs Lupton (2005)
+    Rc  RMS=0.043 mag  (95% CI 0.037–0.048)   +26% vs Lupton (2005)
+    Ic  RMS=0.073 mag  (95% CI 0.059–0.086)   +30% vs Lupton (2005)  [PROVISIONAL]
   Errors:   photometric propagation + calibration RMS + extinction
 """)
 
@@ -1168,14 +1212,21 @@ def main():
     as comparison stars in MaxIm DL, AstroImageJ, APT, Muniwin, etc.
   • σ_tot includes: APASS photometric error + calibration RMS +
     residual extinction uncertainty.
-  • V and B (v5.0): re-derived on N=281 validation stars from four
-    independent catalogues (Landolt 1992/2013, Clem & Landolt 2013,
-    Stetson/Pancino 2022). +9% improvement for V; +40% for B vs Lupton (2005).
-  • Rc (v4.0, confirmed): RMS = 0.051 mag, validated on N=281 stars.
-  • Ic (v4.0, provisional): RMS = 0.083 mag (4-parameter model with (r-i)^2
-    and (g-r) covariate). Use with caution for precision < 0.05 mag.
+  • All formulae from N. Montigiani (2026), JAAVSO. Calibrated by ODR fit
+    on N=41,311 APASS DR9 stars and validated on N=287 independent standards
+    from four catalogues (Landolt 1992/2013, Clem & Landolt 2013,
+    Stetson/Pancino 2022).
+  • RMS improvements over Lupton (2005):
+        V:  0.030 mag  (+7%)     —  no significant chromatic trend (p=0.483)
+        B:  0.053 mag  (+36%)    —  largest improvement of this work
+        Rc: 0.043 mag  (+26%)    —  no significant chromatic trend (p=0.273)
+        Ic: 0.073 mag  (+30%)    —  PROVISIONAL: scatter still ~0.07 mag,
+                                    M-star coverage limited (N=20 in validation).
+                                    Use local Landolt calibration for σ < 0.05 mag.
   • For fields with E(B-V) > 0.20 mag, consider applying extinction
     corrections (Version A) before using comparison stars.
+  • Do not apply to Be, Am, Ap, or eclipsing binary stars, or outside
+    the calibration range −0.28 ≤ (g-r) ≤ +1.10.
 """)
 
 
